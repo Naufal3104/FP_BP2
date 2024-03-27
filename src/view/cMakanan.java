@@ -32,13 +32,14 @@ public class cMakanan extends javax.swing.JFrame {
     }
 
     class makanan extends cMakanan{
-        int id_masakan, harga;
-        String nama_makanan, status;
+        int id_masakan, harga, qty;
+        String nama_makanan;
         
         makanan(){
             this.nama_makanan = text_nama_masakan.getText();
             this.harga = Integer.parseInt(text_harga_masakan.getText());
-            this.status = combo_status_masakan.getSelectedItem().toString();
+            this.qty = Integer.parseInt(text_qty.getText());
+           
         }
     }
     
@@ -47,7 +48,7 @@ public class cMakanan extends javax.swing.JFrame {
         model.addColumn("ID Masakan");
         model.addColumn("Nama Masakan");
         model.addColumn("Harga");
-        model.addColumn("Status Makanan");
+        model.addColumn("QTY");
         tabel_masakan.setModel(model);
         
         try {
@@ -58,7 +59,7 @@ public class cMakanan extends javax.swing.JFrame {
                     rs.getInt("id_masakan"),
                     rs.getString("nama_makanan"),
                     rs.getInt("harga"),
-                    rs.getString("status")
+                    rs.getInt("qty"),
                     
                 };
                 model.addRow(data);
@@ -70,6 +71,7 @@ public class cMakanan extends javax.swing.JFrame {
         text_id_masakan.setText("");
         text_harga_masakan.setText("");
         text_nama_masakan.setText("");
+        text_qty.setText("");
         
         
     }
@@ -89,8 +91,6 @@ public class cMakanan extends javax.swing.JFrame {
         text_harga_masakan = new javax.swing.JTextField();
         text_nama_masakan = new javax.swing.JTextField();
         text_id_masakan = new javax.swing.JTextField();
-        jLabel5 = new javax.swing.JLabel();
-        combo_status_masakan = new javax.swing.JComboBox<>();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabel_masakan = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
@@ -100,6 +100,8 @@ public class cMakanan extends javax.swing.JFrame {
         btn_registrasi = new javax.swing.JButton();
         btn_logout = new javax.swing.JButton();
         btn_transaksi = new javax.swing.JButton();
+        jLabel5 = new javax.swing.JLabel();
+        text_qty = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -118,15 +120,6 @@ public class cMakanan extends javax.swing.JFrame {
         });
 
         text_id_masakan.setEnabled(false);
-
-        jLabel5.setText("Status");
-
-        combo_status_masakan.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Tersedia", "Habis" }));
-        combo_status_masakan.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                combo_status_masakanActionPerformed(evt);
-            }
-        });
 
         tabel_masakan.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -149,7 +142,6 @@ public class cMakanan extends javax.swing.JFrame {
         jPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         btn_input.setText("INPUT");
-        btn_input.setEnabled(false);
         btn_input.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btn_inputActionPerformed(evt);
@@ -157,7 +149,6 @@ public class cMakanan extends javax.swing.JFrame {
         });
 
         btn_update.setText("UPDATE");
-        btn_update.setEnabled(false);
         btn_update.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btn_updateActionPerformed(evt);
@@ -165,7 +156,6 @@ public class cMakanan extends javax.swing.JFrame {
         });
 
         btn_delete.setText("DELETE");
-        btn_delete.setEnabled(false);
         btn_delete.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btn_deleteActionPerformed(evt);
@@ -173,7 +163,6 @@ public class cMakanan extends javax.swing.JFrame {
         });
 
         btn_registrasi.setText("MENU REGISTRASI");
-        btn_registrasi.setEnabled(false);
         btn_registrasi.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btn_registrasiActionPerformed(evt);
@@ -223,6 +212,14 @@ public class cMakanan extends javax.swing.JFrame {
             }
         });
 
+        jLabel5.setText("QTY");
+
+        text_qty.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                text_qtyActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -246,8 +243,12 @@ public class cMakanan extends javax.swing.JFrame {
                         .addGap(164, 164, 164)
                         .addComponent(btn_logout, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(61, 61, 61))
-                    .addGroup(layout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(61, 61, 61)
+                                .addComponent(text_qty))
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                 .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
@@ -255,15 +256,11 @@ public class cMakanan extends javax.swing.JFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(33, 33, 33)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(text_harga_masakan)
-                                    .addComponent(text_nama_masakan)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(combo_status_masakan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(0, 0, Short.MAX_VALUE)))))
+                                    .addComponent(text_nama_masakan))))
                         .addGap(445, 445, 445))))
         );
         layout.setVerticalGroup(
@@ -296,8 +293,8 @@ public class cMakanan extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel5)
-                    .addComponent(combo_status_masakan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(55, 55, 55)
+                    .addComponent(text_qty, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(61, 61, 61)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(55, 55, 55)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -306,10 +303,6 @@ public class cMakanan extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void combo_status_masakanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_combo_status_masakanActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_combo_status_masakanActionPerformed
 
     private void text_nama_masakanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_text_nama_masakanActionPerformed
         // TODO add your handling code here:
@@ -323,7 +316,7 @@ public class cMakanan extends javax.swing.JFrame {
             stat.setInt(1, 0);
             stat.setString(2, mkn.nama_makanan);
             stat.setInt(3, mkn.harga);
-            stat.setString(4, mkn.status);
+            stat.setInt(4, mkn.qty);
             stat.executeUpdate();
             refreshTable();
         } catch (Exception e) {
@@ -361,6 +354,7 @@ public class cMakanan extends javax.swing.JFrame {
         text_id_masakan.setText(model.getValueAt(tabel_masakan.getSelectedRow(), 0).toString());
         text_nama_masakan.setText(model.getValueAt(tabel_masakan.getSelectedRow(), 1).toString());
         text_harga_masakan.setText(model.getValueAt(tabel_masakan.getSelectedRow(), 2).toString());
+        text_qty.setText(model.getValueAt(tabel_masakan.getSelectedRow(), 3).toString());
     }//GEN-LAST:event_tabel_masakanMouseClicked
 
     private void btn_updateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_updateActionPerformed
@@ -368,10 +362,10 @@ public class cMakanan extends javax.swing.JFrame {
         try {
             makanan mkn = new makanan();
             this.stat=k.getCon().prepareStatement("update makanan set nama_makanan=?,"
-                    + "harga=?, status=? where id_masakan=?");
+                    + "harga=? + qty=? where id_masakan=?");
             stat.setString(1, mkn.nama_makanan);
             stat.setInt(2,mkn.harga);
-            stat.setString(3, mkn.status);
+            stat.setInt(3,mkn.qty);
             stat.setInt(4,Integer.parseInt(text_id_masakan.getText()));
             stat.executeUpdate();
             refreshTable();
@@ -386,6 +380,11 @@ public class cMakanan extends javax.swing.JFrame {
         tran.setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_btn_transaksiActionPerformed
+
+    private void text_qtyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_text_qtyActionPerformed
+        // TODO add your handling code here:
+        
+    }//GEN-LAST:event_text_qtyActionPerformed
 
     /**
      * @param args the command line arguments
@@ -430,7 +429,6 @@ public class cMakanan extends javax.swing.JFrame {
     public javax.swing.JButton btn_registrasi;
     public javax.swing.JButton btn_transaksi;
     public javax.swing.JButton btn_update;
-    private javax.swing.JComboBox<String> combo_status_masakan;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -442,5 +440,6 @@ public class cMakanan extends javax.swing.JFrame {
     private javax.swing.JTextField text_harga_masakan;
     private javax.swing.JTextField text_id_masakan;
     private javax.swing.JTextField text_nama_masakan;
+    private javax.swing.JTextField text_qty;
     // End of variables declaration//GEN-END:variables
 }
