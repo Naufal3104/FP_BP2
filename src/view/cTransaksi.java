@@ -4,7 +4,6 @@
  */
 package view;
 
-
 import javax.swing.table.DefaultTableModel;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,38 +18,40 @@ import koneksi.koneksi;
  * @author ahnaf
  */
 public class cTransaksi extends javax.swing.JFrame {
+
     private DefaultTableModel model = null;
     private PreparedStatement stat;
     private ResultSet rs;
     koneksi k = new koneksi();
-    
+
     /**
      * Creates new form cMakanan
      */
     public cTransaksi() {
         initComponents();
     }
-    
-    class transaksi extends cTransaksi{
+
+    class transaksi extends cTransaksi {
+
         int id_transaksi, id_masakan, harga, jumlah_beli, total;
         String nama_pelanggan, tanggal, nama_makanan;
 
         public transaksi() {
-            this.nama_pelanggan=text_nama_pelanggan.getText();
-            String combo=combo_id_masakan.getSelectedItem().toString();
-            String arr [] = combo.split(":");
+            this.nama_pelanggan = text_nama_pelanggan.getText();
+            String combo = combo_id_masakan.getSelectedItem().toString();
+            String arr[] = combo.split(":");
             this.id_masakan = Integer.parseInt(arr[0]);
             try {
                 Date date = text_tanggal.getDate();
                 DateFormat dateformat = new SimpleDateFormat("YYYY--MM--dd");
-                this.tanggal=dateformat.format(date);
+                this.tanggal = dateformat.format(date);
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(null, e.getMessage());
             }
-            this.nama_makanan= arr[1];
-            this.harga=Integer.parseInt(arr[2]);
-            this.jumlah_beli= Integer.parseInt(text_jumlah_beli.getText());
-            this.total=this.harga*this.jumlah_beli;
+            this.nama_makanan = arr[1];
+            this.harga = Integer.parseInt(arr[2]);
+            this.jumlah_beli = Integer.parseInt(text_jumlah_beli.getText());
+            this.total = this.harga * this.jumlah_beli;
         }
     }
 
@@ -98,7 +99,6 @@ public class cTransaksi extends javax.swing.JFrame {
         jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
         jMenu3 = new javax.swing.JMenu();
-        jMenu4 = new javax.swing.JMenu();
         jMenu5 = new javax.swing.JMenu();
 
         jLabel8.setText("TANGGAL");
@@ -308,16 +308,28 @@ public class cTransaksi extends javax.swing.JFrame {
         );
 
         jMenu1.setText("Member");
+        jMenu1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenu1ActionPerformed(evt);
+            }
+        });
         jMenuBar1.add(jMenu1);
 
         jMenu2.setText("User");
+        jMenu2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenu2ActionPerformed(evt);
+            }
+        });
         jMenuBar1.add(jMenu2);
 
         jMenu3.setText("Menu");
+        jMenu3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenu3ActionPerformed(evt);
+            }
+        });
         jMenuBar1.add(jMenu3);
-
-        jMenu4.setText("Transaksi");
-        jMenuBar1.add(jMenu4);
 
         jMenu5.setText("Riwayat Transaksi");
         jMenuBar1.add(jMenu5);
@@ -444,6 +456,26 @@ public class cTransaksi extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton3ActionPerformed
 
+    private void jMenu1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenu1ActionPerformed
+        // TODO add your handling code here:
+        
+
+    }//GEN-LAST:event_jMenu1ActionPerformed
+
+    private void jMenu2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenu2ActionPerformed
+        // TODO add your handling code here:
+        cRegistrasi reg = new cRegistrasi();
+        reg.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_jMenu2ActionPerformed
+
+    private void jMenu3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenu3ActionPerformed
+        // TODO add your handling code here:
+        cMakanan mkn = new cMakanan();
+        mkn.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_jMenu3ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -518,7 +550,6 @@ public class cTransaksi extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
-    private javax.swing.JMenu jMenu4;
     private javax.swing.JMenu jMenu5;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
