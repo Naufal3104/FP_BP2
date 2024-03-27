@@ -27,9 +27,35 @@ public class cTransaksi extends javax.swing.JFrame {
     /**
      * Creates new form cMakanan
      */
+    public void refreshTable() {
+        model = new DefaultTableModel();
+        model.addColumn("ID Masakan");
+        model.addColumn("Nama Masakan");
+        model.addColumn("Harga");
+        model.addColumn("Stok");
+        tabel_makanan.setModel(model);
+
+        try {
+            this.stat = k.getCon().prepareStatement("select * from makanan");
+            this.rs = this.stat.executeQuery();
+            while (rs.next()) {
+                Object[] data = {
+                    rs.getInt("id_masakan"),
+                    rs.getString("nama_makanan"),
+                    rs.getInt("harga"),
+                    rs.getInt("stok"),};
+                model.addRow(data);
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
+    }
+
     public cTransaksi() {
         initComponents();
         k.connect();
+        refreshTable();
     }
 
     class transaksi extends cTransaksi {
@@ -87,15 +113,15 @@ public class cTransaksi extends javax.swing.JFrame {
         text_nama_pelanggan = new javax.swing.JTextField();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tabel_makanan = new javax.swing.JTable();
         jLabel2 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox<>();
         jLabel6 = new javax.swing.JLabel();
-        jSpinner1 = new javax.swing.JSpinner();
+        spinQTY = new javax.swing.JSpinner();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
+        text_id_menu = new javax.swing.JTextField();
         jButton4 = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
@@ -220,7 +246,7 @@ public class cTransaksi extends javax.swing.JFrame {
 
         jPanel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tabel_makanan.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -231,13 +257,16 @@ public class cTransaksi extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane2.setViewportView(jTable1);
+        tabel_makanan.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tabel_makananMouseClicked(evt);
+            }
+        });
+        jScrollPane2.setViewportView(tabel_makanan);
 
         jLabel2.setText("Keranjang");
 
-        jLabel4.setText("Nama Menu");
-
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jLabel4.setText("ID Menu");
 
         jLabel6.setText("QTY");
 
@@ -272,8 +301,8 @@ public class cTransaksi extends javax.swing.JFrame {
                                     .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(18, 18, 18)
                                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jSpinner1)))
+                                    .addComponent(spinQTY)
+                                    .addComponent(text_id_menu)))
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addGap(0, 45, Short.MAX_VALUE)
                                 .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -292,14 +321,14 @@ public class cTransaksi extends javax.swing.JFrame {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 469, Short.MAX_VALUE)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGap(21, 21, 21)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addGap(26, 26, 26)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jLabel4)
-                            .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
+                            .addComponent(text_id_menu, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel6)
-                            .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(spinQTY, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jButton1)
@@ -317,6 +346,11 @@ public class cTransaksi extends javax.swing.JFrame {
         });
 
         jMenu1.setText("Member");
+        jMenu1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jMenu1MouseClicked(evt);
+            }
+        });
         jMenu1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenu1ActionPerformed(evt);
@@ -499,6 +533,17 @@ public class cTransaksi extends javax.swing.JFrame {
         this.setVisible(false);
     }//GEN-LAST:event_jButton4ActionPerformed
 
+    private void tabel_makananMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabel_makananMouseClicked
+        text_id_menu.setText(model.getValueAt(tabel_makanan.getSelectedRow(), 0).toString());
+        spinQTY.setValue(model.getValueAt(tabel_makanan.getSelectedRow(), 3));
+    }//GEN-LAST:event_tabel_makananMouseClicked
+
+    private void jMenu1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu1MouseClicked
+        cRegistrasiMember mbr = new cRegistrasiMember();
+        mbr.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_jMenu1MouseClicked
+
     /**
      * @param args the command line arguments
      */
@@ -560,7 +605,6 @@ public class cTransaksi extends javax.swing.JFrame {
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
-    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
@@ -580,9 +624,10 @@ public class cTransaksi extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JSpinner jSpinner1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JSpinner spinQTY;
+    private javax.swing.JTable tabel_makanan;
     private javax.swing.JTable tabel_transaksi;
+    private javax.swing.JTextField text_id_menu;
     private javax.swing.JTextField text_jumlah_beli;
     private javax.swing.JTextField text_nama_pelanggan;
     private com.toedter.calendar.JDateChooser text_tanggal;

@@ -48,7 +48,7 @@ public class cMakanan extends javax.swing.JFrame {
         model.addColumn("ID Masakan");
         model.addColumn("Nama Masakan");
         model.addColumn("Harga");
-        model.addColumn("");
+        model.addColumn("Stok");
         tabel_masakan.setModel(model);
         
         try {
