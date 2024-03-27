@@ -32,13 +32,13 @@ public class cMakanan extends javax.swing.JFrame {
     }
 
     class makanan extends cMakanan{
-        int id_masakan, harga, qty;
+        int id_masakan, harga, stok;
         String nama_makanan;
         
         makanan(){
             this.nama_makanan = text_nama_masakan.getText();
             this.harga = Integer.parseInt(text_harga_masakan.getText());
-            this.qty = Integer.parseInt(text_qty.getText());
+            this.stok = Integer.parseInt(text_stok.getText());
            
         }
     }
@@ -48,7 +48,7 @@ public class cMakanan extends javax.swing.JFrame {
         model.addColumn("ID Masakan");
         model.addColumn("Nama Masakan");
         model.addColumn("Harga");
-        model.addColumn("QTY");
+        model.addColumn("");
         tabel_masakan.setModel(model);
         
         try {
@@ -59,7 +59,7 @@ public class cMakanan extends javax.swing.JFrame {
                     rs.getInt("id_masakan"),
                     rs.getString("nama_makanan"),
                     rs.getInt("harga"),
-                    rs.getInt("qty"),
+                    rs.getInt("stok"),
                     
                 };
                 model.addRow(data);
@@ -71,7 +71,7 @@ public class cMakanan extends javax.swing.JFrame {
         text_id_masakan.setText("");
         text_harga_masakan.setText("");
         text_nama_masakan.setText("");
-        text_qty.setText("");
+        text_stok.setText("");
         
         
     }
@@ -101,7 +101,7 @@ public class cMakanan extends javax.swing.JFrame {
         btn_logout = new javax.swing.JButton();
         btn_transaksi = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
-        text_qty = new javax.swing.JTextField();
+        text_stok = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -214,9 +214,9 @@ public class cMakanan extends javax.swing.JFrame {
 
         jLabel5.setText("QTY");
 
-        text_qty.addActionListener(new java.awt.event.ActionListener() {
+        text_stok.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                text_qtyActionPerformed(evt);
+                text_stokActionPerformed(evt);
             }
         });
 
@@ -248,7 +248,7 @@ public class cMakanan extends javax.swing.JFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(61, 61, 61)
-                                .addComponent(text_qty))
+                                .addComponent(text_stok))
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                 .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
@@ -293,7 +293,7 @@ public class cMakanan extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel5)
-                    .addComponent(text_qty, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(text_stok, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(61, 61, 61)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(55, 55, 55)
@@ -316,7 +316,7 @@ public class cMakanan extends javax.swing.JFrame {
             stat.setInt(1, 0);
             stat.setString(2, mkn.nama_makanan);
             stat.setInt(3, mkn.harga);
-            stat.setInt(4, mkn.qty);
+            stat.setInt(4, mkn.stok);
             stat.executeUpdate();
             refreshTable();
         } catch (Exception e) {
@@ -354,7 +354,7 @@ public class cMakanan extends javax.swing.JFrame {
         text_id_masakan.setText(model.getValueAt(tabel_masakan.getSelectedRow(), 0).toString());
         text_nama_masakan.setText(model.getValueAt(tabel_masakan.getSelectedRow(), 1).toString());
         text_harga_masakan.setText(model.getValueAt(tabel_masakan.getSelectedRow(), 2).toString());
-        text_qty.setText(model.getValueAt(tabel_masakan.getSelectedRow(), 3).toString());
+        text_stok.setText(model.getValueAt(tabel_masakan.getSelectedRow(), 3).toString());
     }//GEN-LAST:event_tabel_masakanMouseClicked
 
     private void btn_updateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_updateActionPerformed
@@ -362,10 +362,10 @@ public class cMakanan extends javax.swing.JFrame {
         try {
             makanan mkn = new makanan();
             this.stat=k.getCon().prepareStatement("update makanan set nama_makanan=?,"
-                    + "harga=? + qty=? where id_masakan=?");
+                    + "harga=? + stok=? where id_masakan=?");
             stat.setString(1, mkn.nama_makanan);
             stat.setInt(2,mkn.harga);
-            stat.setInt(3,mkn.qty);
+            stat.setInt(3,mkn.stok);
             stat.setInt(4,Integer.parseInt(text_id_masakan.getText()));
             stat.executeUpdate();
             refreshTable();
@@ -381,10 +381,10 @@ public class cMakanan extends javax.swing.JFrame {
         this.setVisible(false);
     }//GEN-LAST:event_btn_transaksiActionPerformed
 
-    private void text_qtyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_text_qtyActionPerformed
+    private void text_stokActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_text_stokActionPerformed
         // TODO add your handling code here:
         
-    }//GEN-LAST:event_text_qtyActionPerformed
+    }//GEN-LAST:event_text_stokActionPerformed
 
     /**
      * @param args the command line arguments
@@ -440,6 +440,6 @@ public class cMakanan extends javax.swing.JFrame {
     private javax.swing.JTextField text_harga_masakan;
     private javax.swing.JTextField text_id_masakan;
     private javax.swing.JTextField text_nama_masakan;
-    private javax.swing.JTextField text_qty;
+    private javax.swing.JTextField text_stok;
     // End of variables declaration//GEN-END:variables
 }
