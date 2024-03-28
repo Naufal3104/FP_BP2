@@ -59,6 +59,10 @@ public class cTransaksi extends javax.swing.JFrame {
         initComponents();
         k.connect();
         refreshTable();
+        Date date = new Date(); // Mendapatkan tanggal dan waktu saat ini
+        DateFormat dateformat = new SimpleDateFormat("YYYY--MM--dd");
+        text_nama_pelanggan.setText(dateformat.format(date));
+
     }
 
     class transaksi extends cTransaksi {
