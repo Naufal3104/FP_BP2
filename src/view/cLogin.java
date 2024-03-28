@@ -132,9 +132,24 @@ public class cLogin extends javax.swing.JFrame {
         if (u.id_level == 0) {
             JOptionPane.showMessageDialog(null, "AKUN TIDAK DITEMUKAN");
         } else {
-            cTransaksi tran = new cTransaksi();
-            tran.setVisible(true);
-            this.setVisible(false);
+            switch (u.id_level) {
+                case 1:
+                    cTransaksi tran = new cTransaksi();
+                    tran.setVisible(true);
+                    this.setVisible(false);
+                    break;
+                case 2:
+                    cTransaksi tran1 = new cTransaksi();
+                    tran1.setVisible(true);
+                    this.setVisible(false);
+                    break;
+                case 3:
+                    cTransaksi tran2 = new cTransaksi();
+                    tran2.setVisible(true);
+                    this.setVisible(false);
+                    tran2.btn_cetak_laporan.setEnabled(true);
+                    break;
+            }
         }
     }//GEN-LAST:event_btn_loginActionPerformed
 
