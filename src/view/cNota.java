@@ -4,17 +4,56 @@
  */
 package view;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import koneksi.koneksi;
+
 /**
  *
  * @author ahnaf
  */
 public class cNota extends javax.swing.JFrame {
-
+private DefaultTableModel model = null;
+    private PreparedStatement stat;
+    private ResultSet rs;
+    koneksi k = new koneksi();
     /**
      * Creates new form cNota
      */
     public cNota() {
         initComponents();
+        k.connect();
+        refreshTbale();
+    }
+    
+    
+    public void refreshTbale(){
+        model=new DefaultTableModel();
+        model.addColumn("ID Detail");
+        model.addColumn("ID Transaksi");
+        model.addColumn("ID Makanan");
+        model.addColumn("QTY");
+        model.addColumn("Sub Total");
+        tabel_nota.setModel(model);
+        try {
+            this.stat=k.getCon().prepareStatement("select * from detailtransaksi where id_transaksi=2");
+            this.rs=this.stat.executeQuery();
+            while(rs.next()){
+                Object [] data ={
+                    rs.getString("id_detail"),
+                    rs.getString("id_transaksi"),
+                    rs.getString("id_makanan"),
+                    rs.getString("qty"),
+                    rs.getString("subtotal")
+                    
+                };
+                model.addRow(data);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
     }
 
     /**
@@ -32,7 +71,7 @@ public class cNota extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tabel_nota = new javax.swing.JTable();
         jLabel2 = new javax.swing.JLabel();
         txtUser = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
@@ -53,14 +92,13 @@ public class cNota extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(480, 360));
-        setPreferredSize(new java.awt.Dimension(480, 360));
 
         jPanel2.setPreferredSize(new java.awt.Dimension(480, 720));
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel1.setText("Nota");
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tabel_nota.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -71,7 +109,7 @@ public class cNota extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(tabel_nota);
 
         jLabel2.setText("Dilayani Oleh");
 
@@ -246,7 +284,7 @@ public class cNota extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable tabel_nota;
     private javax.swing.JTextField txtMember;
     private javax.swing.JTextField txtTanggal;
     private javax.swing.JTextField txtTanggal1;
