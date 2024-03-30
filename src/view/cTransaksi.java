@@ -88,6 +88,11 @@ public class cTransaksi extends javax.swing.JFrame {
         jLabel12.setText("Welcome, "+chekout_transaksi.getUsername());
 
     }
+    
+    
+    public void update(){
+        
+    }
 
     class transaksi extends cTransaksi {
 
