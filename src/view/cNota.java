@@ -8,7 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import koneksi.koneksi;
+import koneksi.*;
 
 /**
  *
@@ -38,7 +38,7 @@ private DefaultTableModel model = null;
         model.addColumn("Sub Total");
         tabel_nota.setModel(model);
         try {
-            this.stat=k.getCon().prepareStatement("select * from detailtransaksi where id_transaksi=2");
+            this.stat=k.getCon().prepareStatement("select * from detailtransaksi where id_transaksi=" + chekout_transaksi.getTransactionID());
             this.rs=this.stat.executeQuery();
             while(rs.next()){
                 Object [] data ={

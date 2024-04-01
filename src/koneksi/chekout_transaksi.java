@@ -11,7 +11,7 @@ package koneksi;
 public class chekout_transaksi {
 
     private static String username;
-    private static int user_id;
+    private static String user_id;
     private static int id_level; // tambahkan ini
 
     public static String getUsername() {
@@ -22,11 +22,11 @@ public class chekout_transaksi {
         chekout_transaksi.username = username;
     }
 
-    public static int getCashierId() {
+    public static String getCashierId() {
         return user_id;
     }
 
-    public static void setCashierId(int cashierId) {
+    public static void setCashierId(String cashierId) {
         chekout_transaksi.user_id = cashierId;
     }
 
@@ -40,7 +40,7 @@ public class chekout_transaksi {
 
     public static void clearUserSession() {
         username = null;
-        user_id = 0;
+        user_id = null;
         id_level = 0;
     }
     private static String transactionID;
