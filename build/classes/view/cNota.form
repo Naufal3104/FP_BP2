@@ -78,17 +78,17 @@
                                       <Group type="102" alignment="1" attributes="0">
                                           <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                          <Component id="txtTanggal1" min="-2" pref="134" max="-2" attributes="0"/>
+                                          <Component id="txtGrandtotal" min="-2" pref="134" max="-2" attributes="0"/>
                                       </Group>
                                       <Group type="102" alignment="1" attributes="0">
                                           <Component id="jLabel7" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                          <Component id="txtTanggal2" min="-2" pref="134" max="-2" attributes="0"/>
+                                          <Component id="txtTotalbayar" min="-2" pref="134" max="-2" attributes="0"/>
                                       </Group>
                                       <Group type="102" alignment="1" attributes="0">
                                           <Component id="jLabel9" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                          <Component id="txtTanggal4" min="-2" pref="134" max="-2" attributes="0"/>
+                                          <Component id="txtKembalian" min="-2" pref="134" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
                               </Group>
@@ -114,7 +114,7 @@
                       </Group>
                       <Group type="102" attributes="0">
                           <Component id="btnKembali" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace min="-2" pref="172" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="150" max="-2" attributes="0"/>
                           <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                           <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                       </Group>
@@ -156,17 +156,17 @@
                   <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jLabel6" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="txtTanggal1" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="txtGrandtotal" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jLabel7" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="txtTanggal2" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="txtTotalbayar" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jLabel9" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="txtTanggal4" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="txtKembalian" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace min="-2" pref="17" max="-2" attributes="0"/>
               </Group>
@@ -229,21 +229,21 @@
             <Property name="text" type="java.lang.String" value="Grand Total"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JTextField" name="txtTanggal1">
+        <Component class="javax.swing.JTextField" name="txtGrandtotal">
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel7">
           <Properties>
             <Property name="text" type="java.lang.String" value="Total bayar"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JTextField" name="txtTanggal2">
+        <Component class="javax.swing.JTextField" name="txtTotalbayar">
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel9">
           <Properties>
             <Property name="text" type="java.lang.String" value="Kembalian"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JTextField" name="txtTanggal4">
+        <Component class="javax.swing.JTextField" name="txtKembalian">
         </Component>
         <Component class="javax.swing.JButton" name="btnKembali">
           <Properties>

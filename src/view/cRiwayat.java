@@ -8,6 +8,8 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import javax.swing.table.TableColumn;
+import koneksi.chekout_transaksi;
 import koneksi.koneksi;
 
 /**
@@ -15,10 +17,12 @@ import koneksi.koneksi;
  * @author LENOVO
  */
 public class cRiwayat extends javax.swing.JFrame {
-    private DefaultTableModel model =null;
+
+    private DefaultTableModel model = null;
     private PreparedStatement stat;
     private ResultSet rs;
     koneksi k = new koneksi();
+
     /**
      * Creates new form cRiwayat
      */
@@ -27,33 +31,42 @@ public class cRiwayat extends javax.swing.JFrame {
         k.connect();
         refreshTable();
     }
-    
-      public void refreshTable(){
+
+    public void refreshTable() {
         model = new DefaultTableModel();
+        model.addColumn("No.");
         model.addColumn("ID Transaksi");
-        model.addColumn("ID Member");
-        model.addColumn("ID User");
+        model.addColumn("Dilayani Oleh");
         model.addColumn("Tanggal");
         model.addColumn("Total");
         model.addColumn("Total Bayar");
         tabel_riwayat.setModel(model);
         try {
-            this.stat = k.getCon().prepareStatement("select * from transaksi");
-            this.rs=this.stat.executeQuery();
-            while(rs.next()){
-                 Object[] data ={
-                     rs.getString("id_transaksi"),
-                     rs.getString("id_member"),
-                     rs.getString("id_user"),
-                     rs.getString("tanggal"),
-                     rs.getString("total"),
-                     rs.getString("total_bayar")
-                 };
-                 model.addRow(data);
+            this.stat = k.getCon().prepareStatement("SELECT t.id_transaksi, u.nama_user, t.tanggal, t.total, t.total_bayar FROM transaksi t "
+                    + " LEFT JOIN user u ON t.id_user = u.id_user");
+            this.rs = this.stat.executeQuery();
+            int i = 1; // Pindahkan inisialisasi variabel i ke luar loop while
+            while (rs.next()) {
+                Object[] data = {
+                    i++,
+                    rs.getString("id_transaksi"),
+                    rs.getString("nama_user"),
+                    rs.getString("tanggal"),
+                    rs.getString("total"),
+                    rs.getString("total_bayar")
+                };
+                model.addRow(data);
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
         }
+
+// Sembunyikan kolom "ID Transaksi"
+        TableColumn idTransaksiColumn = tabel_riwayat.getColumnModel().getColumn(1);
+        idTransaksiColumn.setMinWidth(0);
+        idTransaksiColumn.setMaxWidth(0);
+        idTransaksiColumn.setWidth(0);
+        idTransaksiColumn.setPreferredWidth(0);
 
     }
 
@@ -97,6 +110,11 @@ public class cRiwayat extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tabel_riwayat.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tabel_riwayatMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tabel_riwayat);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -244,6 +262,19 @@ public class cRiwayat extends javax.swing.JFrame {
         tran.setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_jMenu4MouseClicked
+
+    private void tabel_riwayatMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabel_riwayatMouseClicked
+        int pilih = tabel_riwayat.getSelectedRow();
+        if (pilih == -1) {
+            return;
+        }
+        String selectedTransactionID = tabel_riwayat.getModel().getValueAt(pilih, 1).toString();
+        System.out.println(selectedTransactionID);
+        chekout_transaksi.setTransactionID(selectedTransactionID);
+        this.setVisible(false);
+        cNota no = new cNota();
+        no.setVisible(true);
+    }//GEN-LAST:event_tabel_riwayatMouseClicked
 
     /**
      * @param args the command line arguments
