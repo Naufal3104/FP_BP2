@@ -4,17 +4,70 @@
  */
 package view;
 
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import javax.swing.table.TableColumn;
+import koneksi.chekout_transaksi;
+import koneksi.koneksi;
+
 /**
  *
  * @author LENOVO
  */
 public class cRiwayat extends javax.swing.JFrame {
 
+    private DefaultTableModel model = null;
+    private PreparedStatement stat;
+    private ResultSet rs;
+    koneksi k = new koneksi();
+
     /**
      * Creates new form cRiwayat
      */
     public cRiwayat() {
         initComponents();
+        k.connect();
+        refreshTable();
+    }
+
+    public void refreshTable() {
+        model = new DefaultTableModel();
+        model.addColumn("No.");
+        model.addColumn("ID Transaksi");
+        model.addColumn("Dilayani Oleh");
+        model.addColumn("Tanggal");
+        model.addColumn("Total");
+        model.addColumn("Total Bayar");
+        tabel_riwayat.setModel(model);
+        try {
+            this.stat = k.getCon().prepareStatement("SELECT t.id_transaksi, u.nama_user, t.tanggal, t.total, t.total_bayar FROM transaksi t "
+                    + " LEFT JOIN user u ON t.id_user = u.id_user");
+            this.rs = this.stat.executeQuery();
+            int i = 1; // Pindahkan inisialisasi variabel i ke luar loop while
+            while (rs.next()) {
+                Object[] data = {
+                    i++,
+                    rs.getString("id_transaksi"),
+                    rs.getString("nama_user"),
+                    rs.getString("tanggal"),
+                    rs.getString("total"),
+                    rs.getString("total_bayar")
+                };
+                model.addRow(data);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
+
+// Sembunyikan kolom "ID Transaksi"
+        TableColumn idTransaksiColumn = tabel_riwayat.getColumnModel().getColumn(1);
+        idTransaksiColumn.setMinWidth(0);
+        idTransaksiColumn.setMaxWidth(0);
+        idTransaksiColumn.setWidth(0);
+        idTransaksiColumn.setPreferredWidth(0);
+
     }
 
     /**
@@ -31,7 +84,7 @@ public class cRiwayat extends javax.swing.JFrame {
         jDateChooser1 = new com.toedter.calendar.JDateChooser();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tabel_riwayat = new javax.swing.JTable();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
@@ -46,7 +99,7 @@ public class cRiwayat extends javax.swing.JFrame {
 
         jLabel2.setText("Cari berdasarkan tanggal");
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tabel_riwayat.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -57,7 +110,12 @@ public class cRiwayat extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        tabel_riwayat.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tabel_riwayatMouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(tabel_riwayat);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -205,6 +263,19 @@ public class cRiwayat extends javax.swing.JFrame {
         this.setVisible(false);
     }//GEN-LAST:event_jMenu4MouseClicked
 
+    private void tabel_riwayatMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabel_riwayatMouseClicked
+        int pilih = tabel_riwayat.getSelectedRow();
+        if (pilih == -1) {
+            return;
+        }
+        String selectedTransactionID = tabel_riwayat.getModel().getValueAt(pilih, 1).toString();
+        System.out.println(selectedTransactionID);
+        chekout_transaksi.setTransactionID(selectedTransactionID);
+        this.setVisible(false);
+        cNota no = new cNota();
+        no.setVisible(true);
+    }//GEN-LAST:event_tabel_riwayatMouseClicked
+
     /**
      * @param args the command line arguments
      */
@@ -252,6 +323,6 @@ public class cRiwayat extends javax.swing.JFrame {
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable tabel_riwayat;
     // End of variables declaration//GEN-END:variables
 }
