@@ -8,6 +8,7 @@ import javax.swing.table.DefaultTableModel;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import javax.swing.JOptionPane;
+import javax.swing.table.TableColumn;
 import koneksi.koneksi;
 
 /**
@@ -15,6 +16,7 @@ import koneksi.koneksi;
  * @author ahnaf
  */
 public class cRegistrasiMember extends javax.swing.JFrame {
+
     private DefaultTableModel model = null;
     private PreparedStatement stat;
     private ResultSet rs;
@@ -45,6 +47,7 @@ public class cRegistrasiMember extends javax.swing.JFrame {
 
     public void refreshTable() {
         model = new DefaultTableModel();
+        model.addColumn("No.");
         model.addColumn("ID Member");
         model.addColumn("Nama Member");
         model.addColumn("Email");
@@ -55,8 +58,10 @@ public class cRegistrasiMember extends javax.swing.JFrame {
         try {
             this.stat = k.getCon().prepareStatement("select * from member");
             this.rs = this.stat.executeQuery();
+            int i = 1;
             while (rs.next()) {
                 Object[] data = {
+                    i++,
                     rs.getInt("id_member"),
                     rs.getString("nama_member"),
                     rs.getString("email"),
@@ -73,6 +78,11 @@ public class cRegistrasiMember extends javax.swing.JFrame {
         text_email.setText("");
         text_notelp.setText("");
         text_alamat.setText("");
+        TableColumn idTransaksiColumn = tabel_registrasi.getColumnModel().getColumn(1);
+        idTransaksiColumn.setMinWidth(0);
+        idTransaksiColumn.setMaxWidth(0);
+        idTransaksiColumn.setWidth(0);
+        idTransaksiColumn.setPreferredWidth(0);
 
     }
 
@@ -347,30 +357,49 @@ public class cRegistrasiMember extends javax.swing.JFrame {
     private void btn_inputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_inputActionPerformed
         try {
             member mbr = new member();
-            this.stat=k.getCon().prepareStatement("insert into member values(?,?,?,?,?)");
-            stat.setInt(1, 0);
-            stat.setString(2, mbr.nama_member);
-            stat.setString(3, mbr.email);
-            stat.setString(4, mbr.no_telp);
-            stat.setString(5, mbr.alamat);
-            stat.executeUpdate();
-            refreshTable();
+            if (mbr.nama_member == null || mbr.nama_member.isEmpty()
+                    || mbr.email == null || mbr.email.isEmpty()
+                    || mbr.no_telp == null || mbr.no_telp.isEmpty()
+                    || mbr.alamat == null || mbr.alamat.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Value Input tidak valid");
+            } else {
+                this.stat = k.getCon().prepareStatement("insert into member values(?,?,?,?,?)");
+                stat.setInt(1, 0);
+                stat.setString(2, mbr.nama_member);
+                stat.setString(3, mbr.email);
+                stat.setString(4, mbr.no_telp);
+                stat.setString(5, mbr.alamat);
+                stat.executeUpdate();
+                refreshTable();
+                JOptionPane.showMessageDialog(null, "Berhasil Input Member");
+            }
+        } catch (NumberFormatException nfe) {
+            JOptionPane.showMessageDialog(null, "Value Input tidak valid");
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null,e.getMessage());
+            JOptionPane.showMessageDialog(null, e.getMessage());
         }
 
     }//GEN-LAST:event_btn_inputActionPerformed
 
     private void btn_deleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_deleteActionPerformed
         try {
-            this.stat=k.getCon().prepareStatement("delete from member where id_member=?");
-            stat.setInt(1,Integer.parseInt(text_id_member.getText()));
-            stat.executeUpdate();
-            refreshTable();
+            if (text_id_member.getText() == null || text_id_member.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Value Input tidak valid");
+            } else {
+                int dialogResult = JOptionPane.showConfirmDialog(null, "Apakah anda yakin akan menghapus data member ini?", "Warning", JOptionPane.YES_NO_OPTION);
+                if (dialogResult == JOptionPane.YES_OPTION) {
+                    this.stat = k.getCon().prepareStatement("delete from member where id_member=?");
+                    stat.setInt(1, Integer.parseInt(text_id_member.getText()));
+                    stat.executeUpdate();
+                    refreshTable();
+                    JOptionPane.showMessageDialog(null, "Berhasil Hapus Member");
+                }
+            }
+        } catch (NumberFormatException nfe) {
+            JOptionPane.showMessageDialog(null, "Value Input tidak valid");
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null,e.getMessage());
+            JOptionPane.showMessageDialog(null, e.getMessage());
         }
-
     }//GEN-LAST:event_btn_deleteActionPerformed
 
     private void btn_logoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_logoutActionPerformed
@@ -382,30 +411,40 @@ public class cRegistrasiMember extends javax.swing.JFrame {
 
     private void tabel_registrasiMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabel_registrasiMouseClicked
         // TODO add your handling code here:
-        text_id_member.setText(model.getValueAt(tabel_registrasi.getSelectedRow(), 0).toString());
-        text_nama_pelanggan.setText(model.getValueAt(tabel_registrasi.getSelectedRow(), 1).toString());
-        text_email.setText(model.getValueAt(tabel_registrasi.getSelectedRow(), 2).toString());
-        text_notelp.setText(model.getValueAt(tabel_registrasi.getSelectedRow(), 3).toString());
-        text_alamat.setText(model.getValueAt(tabel_registrasi.getSelectedRow(), 4).toString());
+        text_id_member.setText(model.getValueAt(tabel_registrasi.getSelectedRow(), 1).toString());
+        text_nama_pelanggan.setText(model.getValueAt(tabel_registrasi.getSelectedRow(), 2).toString());
+        text_email.setText(model.getValueAt(tabel_registrasi.getSelectedRow(), 3).toString());
+        text_notelp.setText(model.getValueAt(tabel_registrasi.getSelectedRow(), 4).toString());
+        text_alamat.setText(model.getValueAt(tabel_registrasi.getSelectedRow(), 5).toString());
 
     }//GEN-LAST:event_tabel_registrasiMouseClicked
 
     private void btn_updateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_updateActionPerformed
         try {
             member mbr = new member();
-            this.stat=k.getCon().prepareStatement("update member set nama_member=?,"
-                + "email=?, no_telp=?, alamat=? where id_member=?");
-            stat.setString(1, mbr.nama_member);
-            stat.setString(2,mbr.email);
-            stat.setString(3,mbr.no_telp);
-            stat.setString(4,mbr.alamat);
-            stat.setInt(5,Integer.parseInt(text_id_member.getText()));
-            stat.executeUpdate();
-            refreshTable();
+            if (mbr.nama_member == null || mbr.nama_member.isEmpty()
+                    || mbr.email == null || mbr.email.isEmpty()
+                    || mbr.no_telp == null || mbr.no_telp.isEmpty()
+                    || mbr.alamat == null || mbr.alamat.isEmpty()
+                    || text_id_member.getText() == null || text_id_member.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Value Input tidak valid");
+            } else {
+                this.stat = k.getCon().prepareStatement("update member set nama_member=?,"
+                        + "email=?, no_telp=?, alamat=? where id_member=?");
+                stat.setString(1, mbr.nama_member);
+                stat.setString(2, mbr.email);
+                stat.setString(3, mbr.no_telp);
+                stat.setString(4, mbr.alamat);
+                stat.setInt(5, Integer.parseInt(text_id_member.getText()));
+                stat.executeUpdate();
+                refreshTable();
+                JOptionPane.showMessageDialog(null, "Berhasil Update Member");
+            }
+        } catch (NumberFormatException nfe) {
+            JOptionPane.showMessageDialog(null, "Value Input tidak valid");
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
         }
-
     }//GEN-LAST:event_btn_updateActionPerformed
 
     private void jMenu1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu1MouseClicked

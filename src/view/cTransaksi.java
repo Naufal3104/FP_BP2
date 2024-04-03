@@ -12,6 +12,8 @@ import javax.swing.JOptionPane;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.table.TableColumn;
 import koneksi.koneksi;
 import koneksi.chekout_transaksi;
 
@@ -58,12 +60,18 @@ public class cTransaksi extends javax.swing.JFrame {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
         }
+        TableColumn idTransaksiColumn = tabel_makanan.getColumnModel().getColumn(1);
+        idTransaksiColumn.setMinWidth(0);
+        idTransaksiColumn.setMaxWidth(0);
+        idTransaksiColumn.setWidth(0);
+        idTransaksiColumn.setPreferredWidth(0);
     }
 
     public void refreshTable2() {
         model2 = new DefaultTableModel();
+        model2.addColumn("No.");
         model2.addColumn("ID Keranjang");
-        model2.addColumn("ID Menu");
+        model2.addColumn("Nama Makanan");
         model2.addColumn("QTY");
         model2.addColumn("Subtotal");
         tabel_transaksi.setModel(model2);
@@ -72,6 +80,7 @@ public class cTransaksi extends javax.swing.JFrame {
             this.stat = k.getCon().prepareStatement("SELECT\n"
                     + "    k.id_keranjang,\n"
                     + "    k.id_makanan,\n"
+                    + "    m.nama_makanan,\n"
                     + "    k.qty,\n"
                     + "    m.harga * k.qty AS subtotal\n"
                     + "FROM\n"
@@ -79,10 +88,12 @@ public class cTransaksi extends javax.swing.JFrame {
                     + "JOIN\n"
                     + "    makanan m ON k.id_makanan = m.id_makanan;");
             this.rs = this.stat.executeQuery();
+            int i = 1;
             while (rs.next()) {
                 Object[] data = {
+                    i++,
                     rs.getInt("id_keranjang"),
-                    rs.getInt("id_makanan"),
+                    rs.getString("nama_makanan"),
                     rs.getInt("qty"),
                     rs.getInt("subtotal")
                 };
@@ -93,11 +104,16 @@ public class cTransaksi extends javax.swing.JFrame {
         } finally {
             int totalSubtotal = 0;
             for (int i = 0; i < model2.getRowCount(); i++) {
-                int subtotal = (int) model2.getValueAt(i, 3);
+                int subtotal = (int) model2.getValueAt(i, 4);
                 totalSubtotal += subtotal;
             }
             text_total.setText(String.valueOf(totalSubtotal));
         }
+        TableColumn idTransaksiColumn = tabel_transaksi.getColumnModel().getColumn(1);
+        idTransaksiColumn.setMinWidth(0);
+        idTransaksiColumn.setMaxWidth(0);
+        idTransaksiColumn.setWidth(0);
+        idTransaksiColumn.setPreferredWidth(0);
     }
 
     public void clear() {
@@ -115,7 +131,7 @@ public class cTransaksi extends javax.swing.JFrame {
         refreshTable();
         refreshTable2();
         jLabel12.setText("Welcome, " + chekout_transaksi.getUsername());
-
+        text_id_menu.setVisible(false);
     }
 
     public void update() {
@@ -187,6 +203,7 @@ public class cTransaksi extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
         text_id_menu = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
+        text_nama_menu = new javax.swing.JTextField();
         text_total_bayar = new javax.swing.JTextField();
         jLabel11 = new javax.swing.JLabel();
         btn_checkout = new javax.swing.JButton();
@@ -351,19 +368,20 @@ public class cTransaksi extends javax.swing.JFrame {
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 370, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel4)
-                                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(18, 18, 18)
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(spinQTY, javax.swing.GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE)
-                                    .addComponent(text_id_menu)))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                                 .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(text_id_menu)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel4))
+                                .addGap(18, 18, 18)
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(text_nama_menu)
+                                    .addComponent(spinQTY, javax.swing.GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE))))))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -376,15 +394,17 @@ public class cTransaksi extends javax.swing.JFrame {
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 469, Short.MAX_VALUE)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGap(26, 26, 26)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel4)
-                            .addComponent(text_id_menu, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(text_nama_menu, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel6)
                             .addComponent(spinQTY, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
                         .addComponent(jButton1)
+                        .addGap(100, 100, 100)
+                        .addComponent(text_id_menu, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -408,6 +428,7 @@ public class cTransaksi extends javax.swing.JFrame {
 
         jLabel12.setText("Welcome, ");
 
+        text_id_keranjang.setEditable(false);
         text_id_keranjang.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 text_id_keranjangActionPerformed(evt);
@@ -635,16 +656,24 @@ public class cTransaksi extends javax.swing.JFrame {
     private void btn_deleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_deleteActionPerformed
         // TODO add your handling code here:
         try {
-            this.stat = k.getCon().prepareStatement("delete from keranjang where id_keranjang=?");
-            stat.setString(1, text_id_keranjang.getText().toString());
-            stat.executeUpdate();
+            if (text_id_keranjang.getText() == null || text_id_keranjang.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Value Input tidak valid");
+            } else {
+                int dialogResult = JOptionPane.showConfirmDialog(null, "Apakah anda yakin akan menghapus data keranjang ini?", "Warning", JOptionPane.YES_NO_OPTION);
+                if (dialogResult == JOptionPane.YES_OPTION) {
+                    this.stat = k.getCon().prepareStatement("delete from keranjang where id_keranjang=?");
+                    stat.setString(1, text_id_keranjang.getText().toString());
+                    stat.executeUpdate();
+                    clear();
+                    refreshTable();
+                    refreshTable2();
+                    JOptionPane.showMessageDialog(null, "Berhasil Hapus Keranjang");
+                }
+            }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
-        } finally {
-            clear();
-            refreshTable();
-            refreshTable2();
         }
+
     }//GEN-LAST:event_btn_deleteActionPerformed
 
     private void btn_resetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_resetActionPerformed
@@ -688,7 +717,11 @@ public class cTransaksi extends javax.swing.JFrame {
 
     private void tabel_makananMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabel_makananMouseClicked
         text_id_menu.setText(model.getValueAt(tabel_makanan.getSelectedRow(), 1).toString());
-        spinQTY.setValue(model.getValueAt(tabel_makanan.getSelectedRow(), 4));
+        text_nama_menu.setText(model.getValueAt(tabel_makanan.getSelectedRow(), 2).toString());
+        int maxValue = (int) model.getValueAt(tabel_makanan.getSelectedRow(), 4);
+        SpinnerNumberModel spinnerModel = new SpinnerNumberModel(1, 1, maxValue, 1);
+        spinQTY.setModel(spinnerModel);
+
     }//GEN-LAST:event_tabel_makananMouseClicked
 
     private void jMenu1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu1MouseClicked
@@ -729,16 +762,25 @@ public class cTransaksi extends javax.swing.JFrame {
         // TODO add your handling code here:
         try {
             keranjang ker = new keranjang();
-            this.stat = k.getCon().prepareStatement("insert into keranjang values (?,?,?)");
-            stat.setInt(1, 0);
-            stat.setInt(2, ker.id_makanan);
-            stat.setInt(3, ker.qty);
-            stat.executeUpdate();
-            refreshTable();
-            refreshTable2();
+            if (ker.id_makanan <= 0 || ker.qty <= 0) {
+                JOptionPane.showMessageDialog(null, "Value Input tidak valid");
+            } else {
+                this.stat = k.getCon().prepareStatement("insert into keranjang values (?,?,?)");
+                stat.setInt(1, 0);
+                stat.setInt(2, ker.id_makanan);
+                stat.setInt(3, ker.qty);
+                stat.executeUpdate();
+                refreshTable();
+                refreshTable2();
+                clear();
+                JOptionPane.showMessageDialog(null, "Berhasil Input Keranjang");
+            }
+        } catch (NumberFormatException nfe) {
+            JOptionPane.showMessageDialog(null, "Value Input tidak valid");
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
         }
+
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void text_id_keranjangActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_text_id_keranjangActionPerformed
@@ -747,25 +789,33 @@ public class cTransaksi extends javax.swing.JFrame {
 
     private void tabel_transaksiMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabel_transaksiMouseClicked
         // TODO add your handling code here:
-        text_id_keranjang.setText(model2.getValueAt(tabel_transaksi.getSelectedRow(), 0).toString());
-        text_qty.setText(model2.getValueAt(tabel_transaksi.getSelectedRow(), 2).toString());
+        text_id_keranjang.setText(model2.getValueAt(tabel_transaksi.getSelectedRow(), 1).toString());
+        text_qty.setText(model2.getValueAt(tabel_transaksi.getSelectedRow(), 3).toString());
 
     }//GEN-LAST:event_tabel_transaksiMouseClicked
 
     private void btn_updateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_updateActionPerformed
         // TODO add your handling code here:
         try {
-            this.stat = k.getCon().prepareStatement("update keranjang set qty=? where id_keranjang=?");
-            stat.setInt(1, Integer.parseInt(text_qty.getText()));
-            stat.setInt(2, Integer.parseInt(text_id_keranjang.getText()));
-            stat.executeUpdate();
+            if (text_qty.getText() == null || text_qty.getText().isEmpty()
+                    || text_id_keranjang.getText() == null || text_id_keranjang.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Value Input tidak valid");
+            } else {
+                this.stat = k.getCon().prepareStatement("update keranjang set qty=? where id_keranjang=?");
+                stat.setInt(1, Integer.parseInt(text_qty.getText()));
+                stat.setInt(2, Integer.parseInt(text_id_keranjang.getText()));
+                stat.executeUpdate();
+                refreshTable2();
+                refreshTable();
+                clear();
+                JOptionPane.showMessageDialog(null, "Berhasil Update Keranjang");
+            }
+        } catch (NumberFormatException nfe) {
+            JOptionPane.showMessageDialog(null, "Value Input tidak valid");
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
-        } finally {
-            refreshTable2();
-            refreshTable();
-            clear();
         }
+
     }//GEN-LAST:event_btn_updateActionPerformed
 
     /**
@@ -852,6 +902,7 @@ public class cTransaksi extends javax.swing.JFrame {
     private javax.swing.JTable tabel_transaksi;
     private javax.swing.JTextField text_id_keranjang;
     private javax.swing.JTextField text_id_menu;
+    private javax.swing.JTextField text_nama_menu;
     private javax.swing.JTextField text_nama_pelanggan;
     private javax.swing.JTextField text_qty;
     private javax.swing.JTextField text_total;

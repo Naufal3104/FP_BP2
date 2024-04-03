@@ -8,6 +8,7 @@ import javax.swing.table.DefaultTableModel;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import javax.swing.JOptionPane;
+import javax.swing.table.TableColumn;
 import koneksi.koneksi;
 
 /**
@@ -15,11 +16,12 @@ import koneksi.koneksi;
  * @author ahnaf
  */
 public class cRegistrasi extends javax.swing.JFrame {
+
     private DefaultTableModel model = null;
     private PreparedStatement stat;
     private ResultSet rs;
     koneksi k = new koneksi();
-    
+
     /**
      * Creates new form cMakanan
      */
@@ -27,23 +29,25 @@ public class cRegistrasi extends javax.swing.JFrame {
         initComponents();
         k.connect();
         refreshTable();
-        
+
     }
-    
-    class user extends cRegistrasi{
+
+    class user extends cRegistrasi {
+
         int id_user, id_level;
         String username, password, nama_user;
-        
-        public user(){
+
+        public user() {
             username = text_username.getText();
             password = text_password.getText();
             nama_user = text_nama_user.getText();
             id_level = Integer.parseInt(combo_id_level.getSelectedItem().toString());
         }
     }
-    
-    public void refreshTable(){
+
+    public void refreshTable() {
         model = new DefaultTableModel();
+        model.addColumn("No.");
         model.addColumn("Id User");
         model.addColumn("Username");
         model.addColumn("Password");
@@ -52,16 +56,18 @@ public class cRegistrasi extends javax.swing.JFrame {
         tabel_registrasi.setModel(model);
         try {
             this.stat = k.getCon().prepareStatement("select * from user");
-            this.rs=this.stat.executeQuery();
-            while(rs.next()){
-                 Object[] data ={
-                     rs.getString("id_user"),
-                     rs.getString("username"),
-                     rs.getString("password"),
-                     rs.getString("nama_user"),
-                     rs.getString("id_level")
-                 };
-                 model.addRow(data);
+            this.rs = this.stat.executeQuery();
+            int i = 1;
+            while (rs.next()) {
+                Object[] data = {
+                    i++,
+                    rs.getString("id_user"),
+                    rs.getString("username"),
+                    rs.getString("password"),
+                    rs.getString("nama_user"),
+                    rs.getString("id_level")
+                };
+                model.addRow(data);
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
@@ -70,6 +76,11 @@ public class cRegistrasi extends javax.swing.JFrame {
         text_password.setText("");
         text_username.setText("");
         text_nama_user.setText("");
+        TableColumn idTransaksiColumn = tabel_registrasi.getColumnModel().getColumn(1);
+        idTransaksiColumn.setMinWidth(0);
+        idTransaksiColumn.setMaxWidth(0);
+        idTransaksiColumn.setWidth(0);
+        idTransaksiColumn.setPreferredWidth(0);
     }
 
     /**
@@ -368,30 +379,51 @@ public class cRegistrasi extends javax.swing.JFrame {
         // TODO add your handling code here:
         try {
             user u = new user();
-            this.stat=k.getCon().prepareStatement("insert into user values(?,?,?,?,?)");
-            stat.setInt(1, 0);
-            stat.setString(2, u.username);
-            stat.setString(3, u.password);
-            stat.setString(4, u.nama_user);
-            stat.setInt(5,u.id_level);
-            stat.executeUpdate();
-            refreshTable();
+            if (u.username == null || u.username.isEmpty()
+                    || u.password == null || u.password.isEmpty()
+                    || u.nama_user == null || u.nama_user.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Value Input tidak valid");
+            } else {
+                this.stat = k.getCon().prepareStatement("insert into user values(?,?,?,?,?)");
+                stat.setInt(1, 0);
+                stat.setString(2, u.username);
+                stat.setString(3, u.password);
+                stat.setString(4, u.nama_user);
+                stat.setInt(5, u.id_level);
+                stat.executeUpdate();
+                refreshTable();
+                JOptionPane.showMessageDialog(null, "Berhasil Input User");
+            }
+        } catch (NumberFormatException nfe) {
+            JOptionPane.showMessageDialog(null, "Value Input tidak valid");
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
         }
+
     }//GEN-LAST:event_btn_inputActionPerformed
 
     private void btn_deleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_deleteActionPerformed
         // TODO add your handling code here:
         try {
-            user u = new user();
-            this.stat=k.getCon().prepareStatement("delete from user where id_user=?");
-            stat.setString(1, text_id_user.getText());
-            stat.executeUpdate();
-            refreshTable();
+            if (text_id_user.getText() == null || text_id_user.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Value Input tidak valid");
+            } else {
+                int dialogResult = JOptionPane.showConfirmDialog(null, "Apakah anda yakin akan menghapus data user ini?", "Warning", JOptionPane.YES_NO_OPTION);
+                if (dialogResult == JOptionPane.YES_OPTION) {
+                    user u = new user();
+                    this.stat = k.getCon().prepareStatement("delete from user where id_user=?");
+                    stat.setString(1, text_id_user.getText());
+                    stat.executeUpdate();
+                    refreshTable();
+                    JOptionPane.showMessageDialog(null, "Berhasil Hapus User");
+                }
+            }
+        } catch (NumberFormatException nfe) {
+            JOptionPane.showMessageDialog(null, "Value Input tidak valid");
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
         }
+
     }//GEN-LAST:event_btn_deleteActionPerformed
 
     private void btn_menu_makananActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_menu_makananActionPerformed
@@ -405,7 +437,7 @@ public class cRegistrasi extends javax.swing.JFrame {
         mkn.btn_update.setEnabled(true);
         mkn.btn_transaksi.setEnabled(true);
         mkn.btn_registrasi.setEnabled(true);
-        
+
     }//GEN-LAST:event_btn_menu_makananActionPerformed
 
     private void btn_logoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_logoutActionPerformed
@@ -417,29 +449,42 @@ public class cRegistrasi extends javax.swing.JFrame {
 
     private void tabel_registrasiMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabel_registrasiMouseClicked
         // TODO add your handling code here:
-        text_id_user.setText(model.getValueAt(tabel_registrasi.getSelectedRow(), 0).toString());
-        text_username.setText(model.getValueAt(tabel_registrasi.getSelectedRow(), 1).toString());
-        text_password.setText(model.getValueAt(tabel_registrasi.getSelectedRow(), 2).toString());
-        text_nama_user.setText(model.getValueAt(tabel_registrasi.getSelectedRow(), 3).toString());
-        
+        text_id_user.setText(model.getValueAt(tabel_registrasi.getSelectedRow(), 1).toString());
+        text_username.setText(model.getValueAt(tabel_registrasi.getSelectedRow(), 2).toString());
+        text_password.setText(model.getValueAt(tabel_registrasi.getSelectedRow(), 3).toString());
+        text_nama_user.setText(model.getValueAt(tabel_registrasi.getSelectedRow(), 4).toString());
+        String idLevel = model.getValueAt(tabel_registrasi.getSelectedRow(), 5).toString();
+        combo_id_level.setSelectedItem(idLevel);
+
     }//GEN-LAST:event_tabel_registrasiMouseClicked
 
     private void btn_updateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_updateActionPerformed
         // TODO add your handling code here:
         try {
             user u = new user();
-            this.stat = k.getCon().prepareStatement("update user set username=?,"
-                    + "password=?, nama_user=?, id_level=? where id_user=?");
-            stat.setString(1, u.username);
-            stat.setString(2, u.password);
-            stat.setString(3, u.nama_user);
-            stat.setInt(4,u.id_level);
-            stat.setString(5, text_id_user.getText());
-            stat.executeUpdate();
-            refreshTable();
+            if (u.username == null || u.username.isEmpty()
+                    || u.password == null || u.password.isEmpty()
+                    || u.nama_user == null || u.nama_user.isEmpty()
+                    || text_id_user.getText() == null || text_id_user.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Value Input tidak valid");
+            } else {
+                this.stat = k.getCon().prepareStatement("update user set username=?,"
+                        + "password=?, nama_user=?, id_level=? where id_user=?");
+                stat.setString(1, u.username);
+                stat.setString(2, u.password);
+                stat.setString(3, u.nama_user);
+                stat.setInt(4, u.id_level);
+                stat.setString(5, text_id_user.getText());
+                stat.executeUpdate();
+                refreshTable();
+                JOptionPane.showMessageDialog(null, "Berhasil Update User");
+            }
+        } catch (NumberFormatException nfe) {
+            JOptionPane.showMessageDialog(null, "Value Input tidak valid");
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
         }
+
     }//GEN-LAST:event_btn_updateActionPerformed
 
     private void jMenu1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu1MouseClicked
