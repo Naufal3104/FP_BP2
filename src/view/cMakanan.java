@@ -4,67 +4,76 @@
  */
 package view;
 
-
 import javax.swing.table.DefaultTableModel;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import javax.swing.JOptionPane;
+import javax.swing.table.TableColumn;
+import koneksi.chekout_transaksi;
 import koneksi.koneksi;
-
 
 /**
  *
  * @author ahnaf
  */
 public class cMakanan extends javax.swing.JFrame {
-        private DefaultTableModel model = null;
-        private PreparedStatement stat;
-        private ResultSet rs;
-        koneksi k = new koneksi();
-        
+
+    private DefaultTableModel model = null;
+    private PreparedStatement stat;
+    private ResultSet rs;
+    koneksi k = new koneksi();
+
     /**
      * Creates new form cMakanan
      */
     public cMakanan() {
         initComponents();
+        int role = chekout_transaksi.getUserRole();
+        if (role == 1 || role == 2) {
+            btn_input.setEnabled(true);
+            btn_update.setEnabled(true);
+            btn_delete.setEnabled(true);
+        }
         k.connect();
         refreshTable();
     }
 
-    class makanan extends cMakanan{
-        int id_masakan, harga, stok;
+    class makanan extends cMakanan {
+
+        int id_makanan, harga, stok;
         String nama_makanan;
-        
-        makanan(){
+
+        makanan() {
             this.nama_makanan = text_nama_masakan.getText();
             this.harga = Integer.parseInt(text_harga_masakan.getText());
             this.stok = Integer.parseInt(text_stok.getText());
-           
+
         }
     }
-    
-    public void refreshTable(){
+
+    public void refreshTable() {
         model = new DefaultTableModel();
-        model.addColumn("ID Masakan");
+        model.addColumn("No.");
+        model.addColumn("ID Makanan");
         model.addColumn("Nama Masakan");
         model.addColumn("Harga");
         model.addColumn("Stok");
         tabel_masakan.setModel(model);
-        
+
         try {
-            this.stat=k.getCon().prepareStatement("select * from makanan");
-            this.rs=this.stat.executeQuery();
-            while(rs.next()){
-                Object [] data = {
-                    rs.getInt("id_masakan"),
+            this.stat = k.getCon().prepareStatement("select * from makanan");
+            this.rs = this.stat.executeQuery();
+            int i = 1;
+            while (rs.next()) {
+                Object[] data = {
+                    i++,
+                    rs.getInt("id_makanan"),
                     rs.getString("nama_makanan"),
                     rs.getInt("harga"),
-                    rs.getInt("stok"),
-                    
-                };
+                    rs.getInt("stok"),};
                 model.addRow(data);
             }
-            
+
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
         }
@@ -72,9 +81,14 @@ public class cMakanan extends javax.swing.JFrame {
         text_harga_masakan.setText("");
         text_nama_masakan.setText("");
         text_stok.setText("");
-        
-        
+        TableColumn idTransaksiColumn = tabel_masakan.getColumnModel().getColumn(1);
+        idTransaksiColumn.setMinWidth(0);
+        idTransaksiColumn.setMaxWidth(0);
+        idTransaksiColumn.setWidth(0);
+        idTransaksiColumn.setPreferredWidth(0);
+
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -97,9 +111,7 @@ public class cMakanan extends javax.swing.JFrame {
         btn_input = new javax.swing.JButton();
         btn_update = new javax.swing.JButton();
         btn_delete = new javax.swing.JButton();
-        btn_registrasi = new javax.swing.JButton();
         btn_logout = new javax.swing.JButton();
-        btn_transaksi = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
         text_stok = new javax.swing.JTextField();
         jMenuBar1 = new javax.swing.JMenuBar();
@@ -108,9 +120,11 @@ public class cMakanan extends javax.swing.JFrame {
         jMenu3 = new javax.swing.JMenu();
         jMenu5 = new javax.swing.JMenu();
         jMenu4 = new javax.swing.JMenu();
+        jMenu6 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel1.setText("MENU MAKANAN");
 
         jLabel2.setText("ID MASAKAN");
@@ -148,6 +162,7 @@ public class cMakanan extends javax.swing.JFrame {
         jPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         btn_input.setText("INPUT");
+        btn_input.setEnabled(false);
         btn_input.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btn_inputActionPerformed(evt);
@@ -155,6 +170,7 @@ public class cMakanan extends javax.swing.JFrame {
         });
 
         btn_update.setText("UPDATE");
+        btn_update.setEnabled(false);
         btn_update.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btn_updateActionPerformed(evt);
@@ -162,16 +178,10 @@ public class cMakanan extends javax.swing.JFrame {
         });
 
         btn_delete.setText("DELETE");
+        btn_delete.setEnabled(false);
         btn_delete.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btn_deleteActionPerformed(evt);
-            }
-        });
-
-        btn_registrasi.setText("MENU REGISTRASI");
-        btn_registrasi.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_registrasiActionPerformed(evt);
             }
         });
 
@@ -186,9 +196,7 @@ public class cMakanan extends javax.swing.JFrame {
                 .addComponent(btn_update, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(117, 117, 117)
                 .addComponent(btn_delete, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 91, Short.MAX_VALUE)
-                .addComponent(btn_registrasi)
-                .addGap(31, 31, 31))
+                .addContainerGap(251, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -197,24 +205,14 @@ public class cMakanan extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btn_input)
                     .addComponent(btn_update)
-                    .addComponent(btn_delete)
-                    .addComponent(btn_registrasi))
+                    .addComponent(btn_delete))
                 .addGap(36, 36, 36))
         );
 
         btn_logout.setText("LOGOUT");
-        btn_logout.setEnabled(false);
         btn_logout.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btn_logoutActionPerformed(evt);
-            }
-        });
-
-        btn_transaksi.setText("MENU TRANSAKSI");
-        btn_transaksi.setEnabled(false);
-        btn_transaksi.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_transaksiActionPerformed(evt);
             }
         });
 
@@ -281,6 +279,14 @@ public class cMakanan extends javax.swing.JFrame {
         });
         jMenuBar1.add(jMenu4);
 
+        jMenu6.setText("Laporan Penjualan");
+        jMenu6.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jMenu6MouseClicked(evt);
+            }
+        });
+        jMenuBar1.add(jMenu6);
+
         setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -300,10 +306,9 @@ public class cMakanan extends javax.swing.JFrame {
                 .addGap(32, 32, 32)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(btn_transaksi)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(164, 164, 164)
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jLabel1)
+                        .addGap(194, 194, 194)
                         .addComponent(btn_logout, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(61, 61, 61))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
@@ -329,15 +334,10 @@ public class cMakanan extends javax.swing.JFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(36, 36, 36)
-                        .addComponent(btn_transaksi, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(45, 45, 45)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btn_logout))))
+                .addGap(45, 45, 45)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btn_logout))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -373,39 +373,51 @@ public class cMakanan extends javax.swing.JFrame {
 
     private void btn_inputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_inputActionPerformed
         // TODO add your handling code here:
-        try {
-            makanan mkn = new makanan();
-            this.stat=k.getCon().prepareStatement("insert into makanan values(?,?,?,?)");
-            stat.setInt(1, 0);
-            stat.setString(2, mkn.nama_makanan);
-            stat.setInt(3, mkn.harga);
-            stat.setInt(4, mkn.stok);
-            stat.executeUpdate();
-            refreshTable();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null,e.getMessage());
+        if (text_nama_masakan == null || text_harga_masakan == null || text_stok == null
+                || text_nama_masakan.getText().isEmpty() || text_harga_masakan.getText().isEmpty() || text_stok.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Value Input tidak valid");
+        } else {
+            try {
+                makanan mkn = new makanan();
+                this.stat = k.getCon().prepareStatement("insert into makanan values(?,?,?,?)");
+                stat.setInt(1, 0);
+                stat.setString(2, mkn.nama_makanan);
+                stat.setInt(3, mkn.harga);
+                stat.setInt(4, mkn.stok);
+                stat.executeUpdate();
+                JOptionPane.showMessageDialog(null, "Berhasil Input Makanan");
+                refreshTable();
+            } catch (NumberFormatException nfe) {
+                JOptionPane.showMessageDialog(null, "Value Input tidak valid");
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, e.getMessage());
+            }
         }
+
     }//GEN-LAST:event_btn_inputActionPerformed
 
     private void btn_deleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_deleteActionPerformed
         // TODO add your handling code here:
-        try {
-            this.stat=k.getCon().prepareStatement("delete from makanan where id_masakan=?");
-            stat.setInt(1,Integer.parseInt(text_id_masakan.getText()));
-            stat.executeUpdate();
-            refreshTable();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null,e.getMessage());
+        String idMasakanText = text_id_masakan.getText();
+        if (idMasakanText == null || idMasakanText.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Value Input tidak valid");
+        } else {
+            try {
+                int idMasakan = Integer.parseInt(idMasakanText);
+                this.stat = k.getCon().prepareStatement("delete from makanan where id_makanan=?");
+                stat.setInt(1, idMasakan);
+                int dialogResult = JOptionPane.showConfirmDialog(null, "Apakah anda yakin akan menghapus data makanan ini?", "Warning", JOptionPane.YES_NO_OPTION);
+                if (dialogResult == JOptionPane.YES_OPTION) {
+                    stat.executeUpdate();
+                    refreshTable();
+                }
+            } catch (NumberFormatException nfe) {
+                JOptionPane.showMessageDialog(null, "Value Input tidak valid");
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, e.getMessage());
+            }
         }
     }//GEN-LAST:event_btn_deleteActionPerformed
-
-    private void btn_registrasiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_registrasiActionPerformed
-        // TODO add your handling code here:
-        cRegistrasi reg = new cRegistrasi();
-        reg.setVisible(true);
-        this.setVisible(false);
-                
-    }//GEN-LAST:event_btn_registrasiActionPerformed
 
     private void btn_logoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_logoutActionPerformed
         // TODO add your handling code here:
@@ -414,39 +426,41 @@ public class cMakanan extends javax.swing.JFrame {
 
     private void tabel_masakanMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabel_masakanMouseClicked
         // TODO add your handling code here:
-        text_id_masakan.setText(model.getValueAt(tabel_masakan.getSelectedRow(), 0).toString());
-        text_nama_masakan.setText(model.getValueAt(tabel_masakan.getSelectedRow(), 1).toString());
-        text_harga_masakan.setText(model.getValueAt(tabel_masakan.getSelectedRow(), 2).toString());
-        text_stok.setText(model.getValueAt(tabel_masakan.getSelectedRow(), 3).toString());
+        text_id_masakan.setText(model.getValueAt(tabel_masakan.getSelectedRow(), 1).toString());
+        text_nama_masakan.setText(model.getValueAt(tabel_masakan.getSelectedRow(), 2).toString());
+        text_harga_masakan.setText(model.getValueAt(tabel_masakan.getSelectedRow(), 3).toString());
+        text_stok.setText(model.getValueAt(tabel_masakan.getSelectedRow(), 4).toString());
     }//GEN-LAST:event_tabel_masakanMouseClicked
 
     private void btn_updateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_updateActionPerformed
         // TODO add your handling code here:
-        try {
+        if (text_nama_masakan == null || text_harga_masakan == null || text_stok == null || text_id_masakan == null
+                || text_nama_masakan.getText().isEmpty() || text_harga_masakan.getText().isEmpty() || text_stok.getText().isEmpty() || text_id_masakan.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Value Input tidak valid");
+        } else {
             makanan mkn = new makanan();
-            this.stat=k.getCon().prepareStatement("update makanan set nama_makanan=?,"
-                    + "harga=? + stok=? where id_masakan=?");
-            stat.setString(1, mkn.nama_makanan);
-            stat.setInt(2,mkn.harga);
-            stat.setInt(3,mkn.stok);
-            stat.setInt(4,Integer.parseInt(text_id_masakan.getText()));
-            stat.executeUpdate();
-            refreshTable();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, e.getMessage());
+            try {
+                this.stat = k.getCon().prepareStatement("update makanan set nama_makanan=?,"
+                        + "harga=?, stok=? where id_makanan=?");
+                stat.setString(1, mkn.nama_makanan);
+                stat.setInt(2, mkn.harga);
+                stat.setInt(3, mkn.stok);
+                stat.setInt(4, Integer.parseInt(text_id_masakan.getText()));
+                stat.executeUpdate();
+                JOptionPane.showMessageDialog(null, "Berhasil Update Makanan");
+                refreshTable();
+            } catch (NumberFormatException nfe) {
+                JOptionPane.showMessageDialog(null, "Value Input tidak valid");
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, e.getMessage());
+            }
         }
-    }//GEN-LAST:event_btn_updateActionPerformed
 
-    private void btn_transaksiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_transaksiActionPerformed
-        // TODO add your handling code here:
-        cTransaksi tran = new cTransaksi();
-        tran.setVisible(true);
-        this.setVisible(false);
-    }//GEN-LAST:event_btn_transaksiActionPerformed
+    }//GEN-LAST:event_btn_updateActionPerformed
 
     private void text_stokActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_text_stokActionPerformed
         // TODO add your handling code here:
-        
+
     }//GEN-LAST:event_text_stokActionPerformed
 
     private void jMenu1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu1MouseClicked
@@ -491,6 +505,12 @@ public class cMakanan extends javax.swing.JFrame {
         this.setVisible(false);
     }//GEN-LAST:event_jMenu4MouseClicked
 
+    private void jMenu6MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu6MouseClicked
+        cLaporan lp = new cLaporan();
+        lp.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_jMenu6MouseClicked
+
     /**
      * @param args the command line arguments
      */
@@ -531,8 +551,6 @@ public class cMakanan extends javax.swing.JFrame {
     public javax.swing.JButton btn_delete;
     public javax.swing.JButton btn_input;
     public javax.swing.JButton btn_logout;
-    public javax.swing.JButton btn_registrasi;
-    public javax.swing.JButton btn_transaksi;
     public javax.swing.JButton btn_update;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -544,6 +562,7 @@ public class cMakanan extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
     private javax.swing.JMenu jMenu5;
+    private javax.swing.JMenu jMenu6;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;

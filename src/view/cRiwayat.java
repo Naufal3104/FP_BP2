@@ -4,17 +4,129 @@
  */
 package view;
 
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.text.SimpleDateFormat;
+import javax.swing.table.TableColumn;
+import koneksi.chekout_transaksi;
+import koneksi.koneksi;
+
 /**
  *
  * @author LENOVO
  */
 public class cRiwayat extends javax.swing.JFrame {
 
+    private DefaultTableModel model = null;
+    private PreparedStatement stat;
+    private ResultSet rs;
+    koneksi k = new koneksi();
+
     /**
      * Creates new form cRiwayat
      */
     public cRiwayat() {
         initComponents();
+        k.connect();
+        refreshTable();
+    }
+
+    public void refreshTable() {
+        model = new DefaultTableModel();
+        model.addColumn("No.");
+        model.addColumn("ID Transaksi");
+        model.addColumn("Dilayani Oleh");
+        model.addColumn("Tanggal");
+        model.addColumn("Total");
+        model.addColumn("Total Bayar");
+        tabel_riwayat.setModel(model);
+        try {
+            this.stat = k.getCon().prepareStatement("SELECT t.id_transaksi, u.nama_user, t.tanggal, t.total, t.total_bayar FROM transaksi t "
+                    + " LEFT JOIN user u ON t.id_user = u.id_user");
+            this.rs = this.stat.executeQuery();
+            int i = 1;
+            while (rs.next()) {
+                Object[] data = {
+                    i++,
+                    rs.getString("id_transaksi"),
+                    rs.getString("nama_user"),
+                    rs.getString("tanggal"),
+                    rs.getString("total"),
+                    rs.getString("total_bayar")
+                };
+                model.addRow(data);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
+
+// Sembunyikan kolom "ID Transaksi"
+        TableColumn idTransaksiColumn = tabel_riwayat.getColumnModel().getColumn(1);
+        idTransaksiColumn.setMinWidth(0);
+        idTransaksiColumn.setMaxWidth(0);
+        idTransaksiColumn.setWidth(0);
+        idTransaksiColumn.setPreferredWidth(0);
+
+    }
+
+    public void clearTable() {
+        try {
+            model.setRowCount(0);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    public void searchByDate() {
+        model = new DefaultTableModel();
+        model.addColumn("No.");
+        model.addColumn("ID Transaksi");
+        model.addColumn("Dilayani Oleh");
+        model.addColumn("Tanggal");
+        model.addColumn("Total");
+        model.addColumn("Total Bayar");
+        tabel_riwayat.setModel(model);
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String date = null;
+        if (jDateChooser1.getDate() != null) {
+            date = dateFormat.format(jDateChooser1.getDate());
+        }
+
+        try {
+            String sql = "SELECT t.id_transaksi, u.nama_user, t.tanggal, t.total, t.total_bayar FROM transaksi t LEFT JOIN user u ON t.id_user = u.id_user";
+            if (date != null) {
+                sql += " WHERE t.tanggal = ?";
+            }
+            this.stat = k.getCon().prepareStatement(sql);
+            if (date != null) {
+                this.stat.setString(1, date);
+            }
+            this.rs = this.stat.executeQuery();
+            int i = 1;
+            while (rs.next()) {
+                Object[] data = {
+                    i++,
+                    rs.getString("id_transaksi"),
+                    rs.getString("nama_user"),
+                    rs.getString("tanggal"),
+                    rs.getString("total"),
+                    rs.getString("total_bayar")
+                };
+                model.addRow(data);
+            }
+        } catch (Exception e) {
+//            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
+
+        // Sembunyikan kolom "ID Transaksi"
+        TableColumn idTransaksiColumn = tabel_riwayat.getColumnModel().getColumn(1);
+        idTransaksiColumn.setMinWidth(0);
+        idTransaksiColumn.setMaxWidth(0);
+        idTransaksiColumn.setWidth(0);
+        idTransaksiColumn.setPreferredWidth(0);
     }
 
     /**
@@ -31,22 +143,30 @@ public class cRiwayat extends javax.swing.JFrame {
         jDateChooser1 = new com.toedter.calendar.JDateChooser();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tabel_riwayat = new javax.swing.JTable();
+        jButton1 = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
         jMenu3 = new javax.swing.JMenu();
         jMenu5 = new javax.swing.JMenu();
         jMenu4 = new javax.swing.JMenu();
+        jMenu6 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel1.setText("Riwayat Transaksi");
 
+        jDateChooser1.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                jDateChooser1PropertyChange(evt);
+            }
+        });
+
         jLabel2.setText("Cari berdasarkan tanggal");
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tabel_riwayat.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -57,7 +177,19 @@ public class cRiwayat extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        tabel_riwayat.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tabel_riwayatMouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(tabel_riwayat);
+
+        jButton1.setText("Reset");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -66,12 +198,14 @@ public class cRiwayat extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(jLabel2)
                         .addGap(18, 18, 18)
-                        .addComponent(jDateChooser1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane1))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jButton1)
+                            .addComponent(jDateChooser1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addGap(0, 446, Short.MAX_VALUE)
@@ -83,13 +217,15 @@ public class cRiwayat extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1)
-                .addGap(38, 38, 38)
+                .addGap(9, 9, 9)
+                .addComponent(jButton1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jDateChooser1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2))
                 .addGap(12, 12, 12)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 512, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(435, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 695, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         jMenu1.setText("Member");
@@ -147,6 +283,14 @@ public class cRiwayat extends javax.swing.JFrame {
         });
         jMenuBar1.add(jMenu4);
 
+        jMenu6.setText("Laporan Penjualan");
+        jMenu6.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jMenu6MouseClicked(evt);
+            }
+        });
+        jMenuBar1.add(jMenu6);
+
         setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -159,7 +303,7 @@ public class cRiwayat extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -205,6 +349,33 @@ public class cRiwayat extends javax.swing.JFrame {
         this.setVisible(false);
     }//GEN-LAST:event_jMenu4MouseClicked
 
+    private void tabel_riwayatMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabel_riwayatMouseClicked
+        int pilih = tabel_riwayat.getSelectedRow();
+        if (pilih == -1) {
+            return;
+        }
+        String selectedTransactionID = tabel_riwayat.getModel().getValueAt(pilih, 1).toString();
+        System.out.println(selectedTransactionID);
+        chekout_transaksi.setTransactionID(selectedTransactionID);
+        this.setVisible(false);
+        cNota no = new cNota();
+        no.setVisible(true);
+    }//GEN-LAST:event_tabel_riwayatMouseClicked
+
+    private void jMenu6MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu6MouseClicked
+        cLaporan lp = new cLaporan();
+        lp.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_jMenu6MouseClicked
+
+    private void jDateChooser1PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jDateChooser1PropertyChange
+        searchByDate();
+    }//GEN-LAST:event_jDateChooser1PropertyChange
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        refreshTable();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -241,6 +412,7 @@ public class cRiwayat extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
     private com.toedter.calendar.JDateChooser jDateChooser1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -249,9 +421,10 @@ public class cRiwayat extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
     private javax.swing.JMenu jMenu5;
+    private javax.swing.JMenu jMenu6;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable tabel_riwayat;
     // End of variables declaration//GEN-END:variables
 }

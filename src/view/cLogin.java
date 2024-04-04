@@ -4,10 +4,12 @@
  */
 package view;
 
+import java.lang.invoke.MethodHandles;
 import koneksi.koneksi;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import javax.swing.JOptionPane;
+import koneksi.chekout_transaksi;
 
 /**
  *
@@ -26,12 +28,12 @@ public class cLogin extends javax.swing.JFrame {
 
     class user {
 
-        int id_user;
+        String id_user;
         int id_level;
         String username, password, nama_user;
 
         public user() {
-            this.id_user = 0;
+            this.id_user = null;
             this.username = text_username.getText();
             this.password = text_password.getText();
             this.nama_user = "";
@@ -125,6 +127,7 @@ public class cLogin extends javax.swing.JFrame {
             this.rs = this.stat.executeQuery();
             while (rs.next()) {
                 u.id_level = rs.getInt("id_level");
+                u.id_user = rs.getString("id_user");
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
@@ -132,6 +135,9 @@ public class cLogin extends javax.swing.JFrame {
         if (u.id_level == 0) {
             JOptionPane.showMessageDialog(null, "AKUN TIDAK DITEMUKAN");
         } else {
+            chekout_transaksi.setUsername(u.username); // simpan username
+            chekout_transaksi.setCashierId(u.id_user);
+            chekout_transaksi.setUserRole(u.id_level);
             switch (u.id_level) {
                 case 1:
                     cTransaksi tran = new cTransaksi();
@@ -147,7 +153,7 @@ public class cLogin extends javax.swing.JFrame {
                     cTransaksi tran2 = new cTransaksi();
                     tran2.setVisible(true);
                     this.setVisible(false);
-                    tran2.btn_cetak_laporan.setEnabled(true);
+                    tran2.btn_reset.setEnabled(true);
                     break;
             }
         }
