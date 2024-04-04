@@ -71,6 +71,7 @@ public class cTransaksi extends javax.swing.JFrame {
         model2 = new DefaultTableModel();
         model2.addColumn("No.");
         model2.addColumn("ID Keranjang");
+        model2.addColumn("ID Makanan");
         model2.addColumn("Nama Makanan");
         model2.addColumn("QTY");
         model2.addColumn("Subtotal");
@@ -93,6 +94,7 @@ public class cTransaksi extends javax.swing.JFrame {
                 Object[] data = {
                     i++,
                     rs.getInt("id_keranjang"),
+                    rs.getInt("id_makanan"),
                     rs.getString("nama_makanan"),
                     rs.getInt("qty"),
                     rs.getInt("subtotal")
@@ -104,7 +106,7 @@ public class cTransaksi extends javax.swing.JFrame {
         } finally {
             int totalSubtotal = 0;
             for (int i = 0; i < model2.getRowCount(); i++) {
-                int subtotal = (int) model2.getValueAt(i, 4);
+                int subtotal = (int) model2.getValueAt(i, 5);
                 totalSubtotal += subtotal;
             }
             text_total.setText(String.valueOf(totalSubtotal));
@@ -114,12 +116,19 @@ public class cTransaksi extends javax.swing.JFrame {
         idTransaksiColumn.setMaxWidth(0);
         idTransaksiColumn.setWidth(0);
         idTransaksiColumn.setPreferredWidth(0);
+
+        TableColumn idmakananColumn = tabel_transaksi.getColumnModel().getColumn(2);
+        idmakananColumn.setMinWidth(0);
+        idmakananColumn.setMaxWidth(0);
+        idmakananColumn.setWidth(0);
+        idmakananColumn.setPreferredWidth(0);
     }
 
     public void clear() {
         text_id_keranjang.setText("");
+        text_id_menu.setText("");
+        text_nama_menu.setText("");
         text_qty.setText("");
-        text_total.setText("");
         text_total_bayar.setText("");
         text_nama_pelanggan.setText("");
 
@@ -132,10 +141,6 @@ public class cTransaksi extends javax.swing.JFrame {
         refreshTable2();
         jLabel12.setText("Welcome, " + chekout_transaksi.getUsername());
         text_id_menu.setVisible(false);
-    }
-
-    public void update() {
-
     }
 
     class transaksi extends cTransaksi {
@@ -216,6 +221,7 @@ public class cTransaksi extends javax.swing.JFrame {
         jMenu3 = new javax.swing.JMenu();
         jMenu5 = new javax.swing.JMenu();
         jMenu4 = new javax.swing.JMenu();
+        jMenu6 = new javax.swing.JMenu();
 
         jLabel8.setText("TANGGAL");
 
@@ -490,6 +496,14 @@ public class cTransaksi extends javax.swing.JFrame {
         });
         jMenuBar1.add(jMenu4);
 
+        jMenu6.setText("Laporan Penjualan");
+        jMenu6.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jMenu6MouseClicked(evt);
+            }
+        });
+        jMenuBar1.add(jMenu6);
+
         setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -600,54 +614,127 @@ public class cTransaksi extends javax.swing.JFrame {
             int paytotal = Integer.parseInt(text_total_bayar.getText());
             int total = Integer.parseInt(text_total.getText());
             String cashierId = chekout_transaksi.getCashierId();
-            if (paytotal < total && paytotal == 0) {
-                JOptionPane.showMessageDialog(null, "Pay Total must be greater than Total price");
-            } else {
-                java.util.Date date = new java.util.Date();
-                java.sql.Date sqlDate = new java.sql.Date(date.getTime());
-                this.stat = k.getCon().prepareStatement("INSERT INTO transaksi (id_user, tanggal, total, total_bayar) VALUES (?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
-                stat.setString(1, cashierId);
-                stat.setDate(2, sqlDate);
-                stat.setInt(3, total);
-                stat.setInt(4, paytotal);
-                stat.executeUpdate();
+            String memberName = text_nama_pelanggan.getText();
+            String memberId = null;
+            if (!memberName.isEmpty()) {
+                PreparedStatement memberStat = k.getCon().prepareStatement("SELECT id_member FROM member WHERE TRIM(nama_member) COLLATE utf8mb4_general_ci = TRIM(?) COLLATE utf8mb4_general_ci");
+                memberStat.setString(1, memberName);
+                ResultSet memberRs = memberStat.executeQuery();
+                if (memberRs.next()) {
+                    memberId = memberRs.getString("id_member");
+                    total = (int) (total - (total * 0.1));
+                    text_total.setText(Integer.toString(total));
+                    if (paytotal < total || paytotal == 0) {
+                        JOptionPane.showMessageDialog(null, "Total bayar kurang");
+                    } else if (cashierId == null) {
+                        JOptionPane.showMessageDialog(null, "Mohon Login terlebih dahulu");
+                    } else {
+                        java.util.Date date = new java.util.Date();
+                        java.sql.Date sqlDate = new java.sql.Date(date.getTime());
+                        this.stat = k.getCon().prepareStatement("INSERT INTO transaksi (id_user, id_member, tanggal, total, total_bayar) VALUES (?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+                        stat.setString(1, cashierId);
+                        stat.setString(2, memberId);
+                        stat.setDate(3, sqlDate);
+                        stat.setInt(4, total);
+                        stat.setInt(5, paytotal);
+                        stat.executeUpdate();
 
-                // Dapatkan ID transaksi yang baru saja dihasilkan
-                ResultSet generatedKeys = stat.getGeneratedKeys();
-                if (generatedKeys.next()) {
-                    int transactionId = generatedKeys.getInt(1);
+                        // Dapatkan ID transaksi yang baru saja dihasilkan
+                        ResultSet generatedKeys = stat.getGeneratedKeys();
+                        if (generatedKeys.next()) {
+                            int transactionId = generatedKeys.getInt(1);
 
-                    // Set TransactionID to TransactionData
-                    chekout_transaksi.setTransactionID(String.valueOf(transactionId));
+                            // Set TransactionID to TransactionData
+                            chekout_transaksi.setTransactionID(String.valueOf(transactionId));
 
-                    // Ambil semua item di keranjang
-                    for (int i = 0; i < tabel_transaksi.getRowCount(); i++) {
-                        String itemId = tabel_transaksi.getValueAt(i, 1).toString();
-                        int qty = Integer.parseInt(tabel_transaksi.getValueAt(i, 2).toString());
-                        int subtotal = Integer.parseInt(tabel_transaksi.getValueAt(i, 3).toString());
+                            // Ambil semua item di keranjang
+                            for (int i = 0; i < tabel_transaksi.getRowCount(); i++) {
+                                String itemId = tabel_transaksi.getValueAt(i, 2).toString();
+                                int qty = Integer.parseInt(tabel_transaksi.getValueAt(i, 4).toString());
+                                int subtotal = Integer.parseInt(tabel_transaksi.getValueAt(i, 5).toString());
 
-                        // Masukkan data ke tabel detailtransactions
-                        String detailQuery = "INSERT INTO detailtransaksi (id_transaksi, id_makanan, qty, subtotal) VALUES (?, ?, ?, ?)";
-                        PreparedStatement detailPstmt = k.getCon().prepareStatement(detailQuery);
-                        detailPstmt.setInt(1, transactionId);
-                        detailPstmt.setString(2, itemId);
-                        detailPstmt.setInt(3, qty);
-                        detailPstmt.setInt(4, subtotal);
-                        detailPstmt.executeUpdate();
+                                // Masukkan data ke tabel detailtransactions
+                                String detailQuery = "INSERT INTO detailtransaksi (id_transaksi, id_makanan, qty, subtotal) VALUES (?, ?, ?, ?)";
+                                PreparedStatement detailPstmt = k.getCon().prepareStatement(detailQuery);
+                                detailPstmt.setInt(1, transactionId);
+                                detailPstmt.setString(2, itemId);
+                                detailPstmt.setInt(3, qty);
+                                detailPstmt.setInt(4, subtotal);
+                                detailPstmt.executeUpdate();
+                            }
+
+                            // Kosongkan tabel carts
+                            String truncateQuery = "TRUNCATE TABLE keranjang";
+                            PreparedStatement truncatePstmt = k.getCon().prepareStatement(truncateQuery);
+                            truncatePstmt.executeUpdate();
+                        }
+
+                        JOptionPane.showMessageDialog(null, "Checkout Berhasil");
+                        refreshTable();
+                        refreshTable2();
+                        clear();
+                        this.setVisible(false);
+                        new cNota().setVisible(true);
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(null, "Member tidak ditemukan");
+                }
+            } else if (memberName.isEmpty()) {
+                if (paytotal < total || paytotal == 0) {
+                    JOptionPane.showMessageDialog(null, "Total bayar kurang");
+                } else if (cashierId == null) {
+                    JOptionPane.showMessageDialog(null, "Mohon Login terlebih dahulu");
+                } else {
+                    java.util.Date date = new java.util.Date();
+                    java.sql.Date sqlDate = new java.sql.Date(date.getTime());
+                    this.stat = k.getCon().prepareStatement("INSERT INTO transaksi (id_user, id_member, tanggal, total, total_bayar) VALUES (?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+                    stat.setString(1, cashierId);
+                    stat.setString(2, null);
+                    stat.setDate(3, sqlDate);
+                    stat.setInt(4, total);
+                    stat.setInt(5, paytotal);
+                    stat.executeUpdate();
+
+                    // Dapatkan ID transaksi yang baru saja dihasilkan
+                    ResultSet generatedKeys = stat.getGeneratedKeys();
+                    if (generatedKeys.next()) {
+                        int transactionId = generatedKeys.getInt(1);
+
+                        // Set TransactionID to TransactionData
+                        chekout_transaksi.setTransactionID(String.valueOf(transactionId));
+
+                        // Ambil semua item di keranjang
+                        for (int i = 0; i < tabel_transaksi.getRowCount(); i++) {
+                            String itemId = tabel_transaksi.getValueAt(i, 2).toString();
+                            int qty = Integer.parseInt(tabel_transaksi.getValueAt(i, 4).toString());
+                            int subtotal = Integer.parseInt(tabel_transaksi.getValueAt(i, 5).toString());
+
+                            // Masukkan data ke tabel detailtransactions
+                            String detailQuery = "INSERT INTO detailtransaksi (id_transaksi, id_makanan, qty, subtotal) VALUES (?, ?, ?, ?)";
+                            PreparedStatement detailPstmt = k.getCon().prepareStatement(detailQuery);
+                            detailPstmt.setInt(1, transactionId);
+                            detailPstmt.setString(2, itemId);
+                            detailPstmt.setInt(3, qty);
+                            detailPstmt.setInt(4, subtotal);
+                            detailPstmt.executeUpdate();
+                        }
+
+                        // Kosongkan tabel carts
+                        String truncateQuery = "TRUNCATE TABLE keranjang";
+                        PreparedStatement truncatePstmt = k.getCon().prepareStatement(truncateQuery);
+                        truncatePstmt.executeUpdate();
                     }
 
-                    // Kosongkan tabel carts
-                    String truncateQuery = "TRUNCATE TABLE keranjang";
-                    PreparedStatement truncatePstmt = k.getCon().prepareStatement(truncateQuery);
-                    truncatePstmt.executeUpdate();
+                    JOptionPane.showMessageDialog(null, "Checkout Berhasil");
+                    refreshTable();
+                    refreshTable2();
+                    clear();
+                    this.setVisible(false);
+                    new cNota().setVisible(true);
                 }
-
-                JOptionPane.showMessageDialog(null, "Checkout Successful");
-                refreshTable();
-                refreshTable2();
-                clear();
-                new cNota().setVisible(true);
             }
+        } catch (NumberFormatException nbr) {
+            JOptionPane.showMessageDialog(null, "Tambahkan menu ke keranjang");
         } catch (SQLException ex) {
             Logger.getLogger(cTransaksi.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -770,15 +857,16 @@ public class cTransaksi extends javax.swing.JFrame {
                 stat.setInt(2, ker.id_makanan);
                 stat.setInt(3, ker.qty);
                 stat.executeUpdate();
-                refreshTable();
-                refreshTable2();
-                clear();
                 JOptionPane.showMessageDialog(null, "Berhasil Input Keranjang");
             }
         } catch (NumberFormatException nfe) {
             JOptionPane.showMessageDialog(null, "Value Input tidak valid");
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
+        } finally {
+            refreshTable();
+            refreshTable2();
+            clear();
         }
 
     }//GEN-LAST:event_jButton1ActionPerformed
@@ -817,6 +905,12 @@ public class cTransaksi extends javax.swing.JFrame {
         }
 
     }//GEN-LAST:event_btn_updateActionPerformed
+
+    private void jMenu6MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu6MouseClicked
+        cLaporan lp = new cLaporan();
+        lp.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_jMenu6MouseClicked
 
     /**
      * @param args the command line arguments
@@ -892,6 +986,7 @@ public class cTransaksi extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
     private javax.swing.JMenu jMenu5;
+    private javax.swing.JMenu jMenu6;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
