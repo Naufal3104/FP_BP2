@@ -734,7 +734,7 @@ public class cTransaksi extends javax.swing.JFrame {
                 }
             }
         } catch (NumberFormatException nbr) {
-            JOptionPane.showMessageDialog(null, "Tambahkan menu ke keranjang");
+            JOptionPane.showMessageDialog(null, "Value yang dibutuhkan tidak valid");
         } catch (SQLException ex) {
             Logger.getLogger(cTransaksi.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -878,7 +878,7 @@ public class cTransaksi extends javax.swing.JFrame {
     private void tabel_transaksiMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabel_transaksiMouseClicked
         // TODO add your handling code here:
         text_id_keranjang.setText(model2.getValueAt(tabel_transaksi.getSelectedRow(), 1).toString());
-        text_qty.setText(model2.getValueAt(tabel_transaksi.getSelectedRow(), 3).toString());
+        text_qty.setText(model2.getValueAt(tabel_transaksi.getSelectedRow(), 4).toString());
 
     }//GEN-LAST:event_tabel_transaksiMouseClicked
 
